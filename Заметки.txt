@@ -1,0 +1,25 @@
+var Sequelize = require('sequelize');
+var sequelize = new Sequelize('database', 'username', 'password', {
+    host: 'localhost',
+    dialect: 'sqlite',
+    // SQLite only
+    storage: 'my.sqlite'
+});
+
+var User = sequelize.define('user', {
+    username: Sequelize.STRING,
+    birthday: Sequelize.DATE,
+    status: Sequelize.STRING
+});
+
+sequelize.sync().then(function() {
+    return User.create({
+        username: 'janedoe',
+        birthday: new Date(1980, 6, 20),
+        status: 'student'
+    });
+}).then(function(jane) {
+    console.log(jane.get({
+        plain: true
+    }));
+});

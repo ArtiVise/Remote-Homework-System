@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+html
+head
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    title #{title}
+    link(rel='stylesheet', href='/stylesheets/TechTasks.css')
+    link(rel="stylesheet", href="/css/bootstrap.min.css")
+    script(src="/js/jquery.min.js")
+    script(src="/js/bootstrap.min.js")
+    script(type="text/javascript", src="/javascripts/sendAnswer.js")
+    script.
+        var a = 0;
+        function RowClick(row) {
+            //console.log(row.id);
+            a = row.id;
+            //row.style.background = "blue";
+            //alert(row);
+        }
+        function RowClick1(row) {
+            var elems = document.getElementsByName('ActDecision')[0];
+            elems.value = a;
+            console.log(elems.value);
+        }
+        $(document).ready(function () {
+            $(".colors:last").css("background-color", "#b0eeaa");
+            var tr_clr = $(".colors:last").css("background-color");
+            $(".colors:last").css("background-color", "white");
+            $(".colors").click(function () {
+                $(".colors").css("background-color", "white");
+                $(this).css("background-color", tr_clr);
+                //if ($(this).css("background-color") != tr_clr)
+                //    $(this).css("background-color", tr_clr)
+                //else $(this).css("background-color", "white")
+            });
+
+        });
+body
+    div(class="navbar navbar-inverse navbar-fixed-top" role="navigation")
+        div(class="container")
+            div(class="navbar-header")
+                button(type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse")
+                    span(class="sr-only") Toggle navigation
+                    span(class="icon-bar")
+                    span(class="icon-bar")
+                    span(class="icon-bar")
+                a(class="navbar-brand" href="#") Система удаленной сдачи работ
+            div(class="collapse navbar-collapse")
+                ul(class="nav navbar-nav")
+                    li
+                        a(href="/Teacher") Ответы
+                    li
+                        a(href="/TechSubjects") Предметы
+                    li
+                        a(href="/TechTasks") Задачи
+                    li(class="active")
+                        a(href="/TechGroups") Группы
+                div(class="navbar-collapse collapse")
+                    form(class="navbar-form navbar-right" role="form")
+                        Name
+                            | Преподаватель #{TeacherName} &nbsp
+                        input(type="hidden" name="act" value="logout")
+                        button(type="submit" class="btn btn-success") Выйти
+    div(class="container")
+        .panel.panel-info
+            .panel-heading Список групп
+            .panel-body
+                table(class="table table-bordered")
+                    tr
+                        th Номер
+                        th Название группы
+                        th Год обучения
+                    each data in Groups
+                        tr(class="colors" id=data.id onclick='RowClick(this)')
+                            td #{data.num}
+                            td #{data.Groups}
+                            td #{data.Year}
+                div(class="form-group form-inline")
+                    label(class="control-label") Название группы:
+                    | &nbsp;
+                    input(name="TaskName" class="form-control" )
+                    | &nbsp;
+                    | &nbsp;
+                    | &nbsp;
+                    label(class="control-label") Год обучения:
+                    | &nbsp;
+                    input(name="TaskName" class="form-control" )
+                button.btn.btn-primary(type="submit") Открыть список группы
+                button.btn.btn-primary(type="submit") Добавить
+                button.btn.btn-primary(type="submit") Изменить
+                button.btn.btn-primary(type="submit") Удалить
+        .panel.panel-info
+            .panel-heading Список студентов ЕТ-484
+            .panel-body
+                table(class="table table-bordered")
+                    tr
+                        th Номер
+                        th ФИО
+                        th Логин
+                        th Пароль
+                    each data in Students
+                        tr(class="colors" id=data.id onclick='RowClick(this)')
+                            td #{data.num}
+                            td #{data.Name}
+                            td #{data.Login}
+                            td #{data.Password}
+                div(class="form-group form-inline")
+                    label(class="control-label") ФИО:
+                    | &nbsp;
+                    input(name="TaskName" class="form-control" )
+                    | &nbsp;
+                    | &nbsp;
+                    | &nbsp;
+                    label(class="control-label") Логин:
+                    | &nbsp;
+                    input(name="TaskName" class="form-control" )
+                    | &nbsp;
+                    | &nbsp;
+                    | &nbsp;
+                    label(class="control-label") Пароль:
+                    | &nbsp;
+                    input(name="TaskName" class="form-control" )
+                button.btn.btn-primary(type="submit") Добавить
+                button.btn.btn-primary(type="submit") Изменить
+                button.btn.btn-primary(type="submit") Удалить
