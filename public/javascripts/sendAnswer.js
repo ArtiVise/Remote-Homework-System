@@ -17,7 +17,7 @@ this.uploadFile =  function(index) {
         type: 'POST',
         success: function(response) {
             var message = file.element.find('td.message');
-            if(response.status == 'ok') {
+            if(response.status === 'ok') {
                 message.html(response.text);
                 file.element.find('button.uploadButton').remove();
             }

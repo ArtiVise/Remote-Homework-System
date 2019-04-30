@@ -6,36 +6,6 @@ html
         title Задачи
         link(rel='stylesheet', href='/stylesheets/student.css')
         link(rel="stylesheet", href="/css/bootstrap.min.css")
-        script(type="text/javascript", src="/javascripts/student.js")
-        script(src="/js/jquery.min.js")
-        script(src="/js/bootstrap.min.js")
-        script.
-            var a = 0;
-            function RowClick(row) {
-                //console.log(row.id);
-                a = row.id;
-                //row.style.background = "blue";
-                //alert(row);
-            }
-            function RowClick1(row) {
-                var elems = document.getElementsByName('ActTask')[0];
-                elems.value = a;
-                console.log(elems.value);
-            }
-
-            $(document).ready(function() {
-                $(".colors:last").css("background-color", "#b0eeaa");
-                var tr_clr = $(".colors:last").css("background-color");
-                $(".colors:last").css("background-color", "white");
-                $(".colors").click(function () {
-                    $(".colors").css("background-color", "white");
-                    $(this).css("background-color", tr_clr);
-                    //if ($(this).css("background-color") != tr_clr)
-                    //    $(this).css("background-color", tr_clr)
-                    //else $(this).css("background-color", "white")
-                });
-
-            });
     body
         div(class="navbar navbar-inverse navbar-fixed-top" role="navigation")
             div(class="container")
@@ -89,3 +59,33 @@ html
                             input(type="hidden" name="act" value="getTask")
                             input(type="hidden" name="ActTask" value="None")
                             button(type="submit" class="btn btn-primary" onclick='RowClick1(this)') Посмотреть задание
+    script(type="text/javascript", src="/javascripts/student.js")
+    script(src="/js/jquery.min.js")
+    script(src="/js/bootstrap.min.js")
+    script.
+        var a = 0;
+        function RowClick(row) {
+            //console.log(row.id);
+            a = row.id;
+            //row.style.background = "blue";
+            //alert(row);
+        }
+        function RowClick1(row) {
+            var elems = document.getElementsByName('ActTask')[0];
+            elems.value = a;
+            console.log(elems.value);
+        }
+
+        $(document).ready(function () {
+            $(".colors:last").css("background-color", "#b0eeaa");
+            var tr_clr = $(".colors:last").css("background-color");
+            $(".colors:last").css("background-color", "white");
+            $(".colors").click(function () {
+                $(".colors").css("background-color", "white");
+                $(this).css("background-color", tr_clr);
+                //if ($(this).css("background-color") != tr_clr)
+                //    $(this).css("background-color", tr_clr)
+                //else $(this).css("background-color", "white")
+            });
+
+        });

@@ -4,9 +4,17 @@ let Sequelize = require('sequelize'); //Подключение библиоте�
 let mysql = require('mysql'); //Подключение библиотеки для работы с базой данных на MySQL
 
 //Создание подключения к базе данных
-let sequelize = new Sequelize('new_schema', 'root','123456',{    define: {
-    timestamps: false
-}});
+let sequelize = new Sequelize('new_schema', 'root','123456',{
+    host: 'localhost',
+    dialect: 'mysql',
+
+    pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    }
+});
 
 //Описание структуры таблицы студентов
 let Students = sequelize.define('Students', {
@@ -113,162 +121,145 @@ Status.hasMany(Decisions, {foreignKey: 'Status_ID'});
 Teachers.hasMany(Decisions, {foreignKey: 'Teacher_ID'});
 
 /*Функции для работы с хранимыми процедурами*/
-
-function qwer(){
-    return Students.findAll({attributes: ['id', 'Name']}).then(data => {
-        return data;
-    });
-
-}
-
-//Функция авторизации(логин, пароль)
-function Autorization(login,pass){
-    return sequelize.query('CALL Autorization (:login, :pass);',
-        {replacements: { login: login, pass: pass}}).then(data => {
-        return data;
-    });
-}
-
-//Функция получения списка предметов
-function GetListSubjects(){
-    return sequelize.query('CALL GetListSubjects ()',
-        {replacements: {}}).then(data => {
+module.exports = {
+    qwer: function ()
+    {
+        return Students.findAll({attributes: ['id', 'Name']}).then(data => {
             return data;
-    });
-}
+        });
 
-//Функция получения id предмета по названию
-function GetSubjectID(Name){
-    return sequelize.query('CALL GetSubjectID (:Name)',
-        {replacements: { Name: Name}}).then(data => {
-        return data;
-    });
-}
+    },
 
-//Функция получения списка заданий(id предмета, id студента)
-function GetListTask(id,Stud_ID){
-    return sequelize.query('CALL GetListTasks (:id,:Stud_ID)',
-        {replacements: { id: id,Stud_ID:Stud_ID}}).then(data => {
-        return data;
-    });
-}
+    //Функция авторизации(логин, пароль)
+    Autorization: function (login, pass) {
+        return sequelize.query('CALL Autorization (:login, :pass);',
+            {replacements: {login: login, pass: pass}}).then(data => {
+            return data;
+        });
+    },
 
-//Функция получения формулировки задания(id задания)
-function GetTask(id){
-    return sequelize.query('CALL GetTasks (:id)',
-        {replacements: { id: id}}).then(data => {
-        return data;
-    });
-}
+    //Функция получения списка предметов
+    GetListSubjects: function () {
+        return sequelize.query('CALL GetListSubjects ()',
+            {replacements: {}}).then(data => {
+            return data;
+        });
+    },
 
-//Функция получения ссылок на файлы задания(id задания)
-function GetTaskFiles(id){
-    return sequelize.query('CALL GetTaskFiles (:id)',
-        {replacements: { id: id}}).then(data => {
-        return data;
-    });
-}
+    //Функция получения id предмета по названию
+    GetSubjectID: function(Name) {
+        return sequelize.query('CALL GetSubjectID (:Name)',
+            {replacements: {Name: Name}}).then(data => {
+            return data;
+        });
+    },
 
-//Функция добавления решения (id задания, id студента)
-function AddDecision(TaskID,StudentID){
-    return sequelize.query('CALL AddDecision (:TaskID,:StudentID)',
-        {replacements: { TaskID: TaskID,StudentID:StudentID}}).then(data => {
-        return data;
-    });
-}
+    //Функция получения списка заданий(id предмета, id студента)
+    GetListTask: function(id, Stud_ID) {
+        return sequelize.query('CALL GetListTasks (:id,:Stud_ID)',
+            {replacements: {id: id, Stud_ID: Stud_ID}}).then(data => {
+            return data;
+        });
+    },
 
-//Функция добавления файла решения (id решения, ссылка на файл)
-function AddDecisionFile(Decision_ID,DecisionLink){
-    return sequelize.query('CALL AddDecisionFile (:Decision_ID,:DecisionLink)',
-        {replacements: { Decision_ID: Decision_ID,DecisionLink:DecisionLink}}).then(data => {
-        return data;
-    });
-}
+    //Функция получения формулировки задания(id задания)
+    GetTask:function(id) {
+        return sequelize.query('CALL GetTasks (:id)',
+            {replacements: {id: id}}).then(data => {
+            return data;
+        });
+    },
 
-//Функция получения ответов по определенному зданию (id задания)
-function GetTaskDecisions(id1){
-    return sequelize.query('CALL GetTaskDecisions (:id1)',
-        {replacements: { id1: id1}}).then(data => {
-        return data;
-    });
-}
+    //Функция получения ссылок на файлы задания(id задания)
+    GetTaskFiles:function(id) {
+        return sequelize.query('CALL GetTaskFiles (:id)',
+            {replacements: {id: id}}).then(data => {
+            return data;
+        });
+    },
 
-//Функция получения списка ответов по определенному предмету и группе (id предмета, id группы)
-function GetListDecisions(Subj_ID,Group_ID){
-    return sequelize.query('CALL GetListDecisions (:Subj_ID,:Group_ID)',
-        {replacements: { Subj_ID: Subj_ID,Group_ID:Group_ID}}).then(data => {
-        return data;
-    });
-}
+    //Функция добавления решения (id задания, id студента)
+    AddDecision:function(TaskID, StudentID) {
+        return sequelize.query('CALL AddDecision (:TaskID,:StudentID)',
+            {replacements: {TaskID: TaskID, StudentID: StudentID}}).then(data => {
+            return data;
+        });
+    },
 
-function GetTechSubjects(){
-    return sequelize.query('CALL GetTechSubjects ()',
-        {replacements: {}}).then(data => {
-        return data;
-    });
-}
+    //Функция добавления файла решения (id решения, ссылка на файл)
+    AddDecisionFile:function(Decision_ID, DecisionLink) {
+        return sequelize.query('CALL AddDecisionFile (:Decision_ID,:DecisionLink)',
+            {replacements: {Decision_ID: Decision_ID, DecisionLink: DecisionLink}}).then(data => {
+            return data;
+        });
+    },
+
+    //Функция получения ответов по определенному зданию (id задания)
+    GetTaskDecisions:function(id1) {
+        return sequelize.query('CALL GetTaskDecisions (:id1)',
+            {replacements: {id1: id1}}).then(data => {
+            return data;
+        });
+    },
+
+    //Функция получения списка ответов по определенному предмету и группе (id предмета, id группы)
+    GetListDecisions:function(Subj_ID, Group_ID) {
+        return sequelize.query('CALL GetListDecisions (:Subj_ID,:Group_ID)',
+            {replacements: {Subj_ID: Subj_ID, Group_ID: Group_ID}}).then(data => {
+            return data;
+        });
+    },
+
+    GetTechSubjects:function() {
+        return sequelize.query('CALL GetTechSubjects ()',
+            {replacements: {}}).then(data => {
+            return data;
+        });
+    },
 
 
-function GetTechTasks(Subj_ID){
-    return sequelize.query('CALL GetTechTasks (:Subj_ID)',
-        {replacements: { Subj_ID: Subj_ID}}).then(data => {
-        return data;
-    });
-}
+    GetTechTasks:function(Subj_ID) {
+        return sequelize.query('CALL GetTechTasks (:Subj_ID)',
+            {replacements: {Subj_ID: Subj_ID}}).then(data => {
+            return data;
+        });
+    },
 
-function GetTechGroups(){
-    return sequelize.query('CALL GetTechGroups ()',
-        {replacements: {}}).then(data => {
-        return data;
-    });
-}
+    GetTechGroups:function() {
+        return sequelize.query('CALL GetTechGroups ()',
+            {replacements: {}}).then(data => {
+            return data;
+        });
+    },
 
-function GetTechStudents(Groups_ID){
-    return sequelize.query('CALL GetTechStudents (:Groups_ID)',
-        {replacements: { Groups_ID: Groups_ID}}).then(data => {
-        return data;
-    });
-}
+    GetTechStudents:function(Groups_ID) {
+        return sequelize.query('CALL GetTechStudents (:Groups_ID)',
+            {replacements: {Groups_ID: Groups_ID}}).then(data => {
+            return data;
+        });
+    },
 
-function GetStudCheckProgram(Task_ID){
-    return sequelize.query('CALL GetStudCheckProgram (:Task_ID)',
-        {replacements: { Task_ID: Task_ID}}).then(data => {
-        return data;
-    });
-}
+    GetStudCheckProgram:function(Task_ID) {
+        return sequelize.query('CALL GetStudCheckProgram (:Task_ID)',
+            {replacements: {Task_ID: Task_ID}}).then(data => {
+            return data;
+        });
+    },
 
-function ChangeDecisionsStatus(Des_ID,Status_ID){
-    return sequelize.query('CALL ChangeDecisionsStatus (:Des_ID,:Status_ID)',
-        {replacements: {Des_ID: Des_ID, Status_ID:Status_ID}}).then(data => {
-        return data;
-    });
-}
+    ChangeDecisionsStatus: function(Des_ID, Status_ID) {
+        return sequelize.query('CALL ChangeDecisionsStatus (:Des_ID,:Status_ID)',
+            {replacements: {Des_ID: Des_ID, Status_ID: Status_ID}}).then(data => {
+            return data;
+        });
+    },
 
-function AddComment(Decision_ID,Who,TXT){
-    return sequelize.query('CALL AddComment (:Decision_ID,:Who,:TXT)',
-        {replacements: {Decision_ID: Decision_ID, Who:Who, TXT:TXT}}).then(data => {
-        return data;
-    });
-}
-
-exports.qwer = qwer;
-exports.GetListTask = GetListTask;
-exports.GetListSubjects = GetListSubjects;
-exports.GetTask = GetTask;
-exports.Autorization = Autorization;
-exports.GetSubjectID = GetSubjectID;
-exports.GetTaskFiles = GetTaskFiles;
-exports.AddDecision = AddDecision;
-exports.AddDecisionFile = AddDecisionFile;
-exports.GetTaskDecisions = GetTaskDecisions;
-exports.GetListDecisions = GetListDecisions;
-exports.GetTechSubjects = GetTechSubjects;
-exports.GetTechTasks = GetTechTasks;
-exports.GetTechGroups = GetTechGroups;
-exports.GetTechStudents = GetTechStudents;
-exports.GetStudCheckProgram = GetStudCheckProgram;
-exports.ChangeDecisionsStatus = ChangeDecisionsStatus;
-exports.AddComment = AddComment;
+    AddComment: function(Decision_ID, Who, TXT) {
+        return sequelize.query('CALL AddComment (:Decision_ID,:Who,:TXT)',
+            {replacements: {Decision_ID: Decision_ID, Who: Who, TXT: TXT}}).then(data => {
+            return data;
+        });
+    }
+};
 
 //Пример заполнения базы данных
 //sync3();
