@@ -1,6 +1,7 @@
 //Модуль маршрутизации
 "use strict";
-
+const userController = require('../api/controllers/users');
+const app = require('../app');
 let express = require('express'); //Подключение библиотеки Express
 
 let router = express.Router();
@@ -13,7 +14,6 @@ const path = require('path');
 
 let formidable = require('formidable');
 let util = require('util');
-
 let ProgramCheck = require('../ProgramCheck');
 //Обработка GET запроса к странице авторизации
 router.get('/', function(req, res) {
@@ -22,7 +22,7 @@ router.get('/', function(req, res) {
         ind.Autorization(req.query.username,req.query.password).then(data => {
             if(data[0].flag === 1){
                 //Заполнение данных сессии для студента
-                req.session.auth = true;
+                req.session.authorized  = true;
                 req.session.Name = data[0].tmp;
                 req.session.User_ID = data[0].id;
                 res.redirect("/student");
@@ -46,95 +46,7 @@ router.get('/', function(req, res) {
     }
 });
 
-router.post('/', function (req,res) {
-
-});
-
-//Обработка GET запроса к списку задач
-router.get('/student', function(req, res) {
-    //Проверка - хочет ли пользователь деавторизоваться
-    if(req.session.auth === true) {
-        if (req.query.act && req.query.act === 'logout') {
-            delete req.session.auth;
-            res.redirect("/");
-        } else {
-            if (req.query.act && req.query.act === 'getTask') {
-                if (req.query.ActTask !== undefined) req.session.IdTask = req.query.ActTask; else req.session.IdTask = -1;
-                res.redirect("/task"); //Рендеринг страницы с формулировкой задания
-            } else {
-                ind.GetListSubjects().then(subjects => {
-                    if (req.query.subjects === undefined) {
-                        ind.GetListTask(subjects[0].id, req.session.User_ID).then(tasks => {
-                                res.render('student', {
-                                    StudentName: req.session.Name,
-                                    subjects: subjects,
-                                    body: tasks
-                                }); //Рендеринг страницы со списком заданий, если предмет не выбран
-                            }
-                        )
-                    } else {
-                        ind.GetSubjectID(req.query.subjects).then(id => {
-                            ind.GetListTask(id[0].id, req.session.User_ID).then(tasks => {
-                                    res.render('student', {
-                                        StudentName: req.session.Name,
-                                        subjects: subjects,
-                                        subjectsName: req.query.subjects,
-                                        body: tasks
-                                    });//Рендеринг страницы со списком заданий, если предмет выбран
-                                }
-                            )
-                        })
-                    }
-                })
-            }
-        }
-    }else{
-        res.redirect("/");
-    }
-});
-
-//Обработка GET запроса к формулировке задачи
-router.get('/task', function(req, res) {
-    if(req.session.auth === true) {
-        if (req.query.act && req.query.act === 'logout') {
-            delete req.session.auth;
-            res.redirect("/");
-        } else {
-            if (req.session.IdTask !== -1) {
-                ind.GetTask(req.session.IdTask).then(tasks => {
-                    if (tasks !== '') {
-                        ind.GetTaskFiles(req.session.IdTask).then(files => {
-                            let filelink = '1';
-                            console.log(files.length);
-                            if (files.length === 0) {
-                                filelink = ''
-                            } else {
-                                filelink = files[0].FileLink
-                            }
-                            ind.GetTaskDecisions(req.session.IdTask).then(ListDecisions => {
-                                res.render('task', {
-                                    StudentName: req.session.Name,
-                                    Task_ID: tasks[0].id,
-                                    Name: tasks[0].Name,
-                                    Text: tasks[0].Text,
-                                    Link: filelink,
-                                    ListDecisions: ListDecisions
-                                });
-                            })
-
-                        })
-                    } else {
-                        res.render('error', {message: 'Задания не существует'});
-                    }
-                })
-            } else {
-                res.render('task');
-            }
-        }
-    }else{
-        res.redirect("/");
-    }
-});
+router.post('/', userController.authenticate);
 
 //Обработка GET запроса на скачивание файла задания
 router.get('/taskfile', function(req, res) {

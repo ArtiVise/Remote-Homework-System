@@ -6,6 +6,7 @@ let mysql = require('mysql'); //Подключение библиотеки дл
 //Создание подключения к базе данных
 let sequelize = new Sequelize('new_schema', 'root','123456',{
     host: 'localhost',
+    port: 3305,
     dialect: 'mysql',
 
     pool: {

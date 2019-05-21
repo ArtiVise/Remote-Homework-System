@@ -14,13 +14,13 @@ body
 div(class="wrapper")
     h1(class="text-center") Система удаленной сдачи домашних работ
     br
-    form(class="form-signin" action="?act=auth")
+    form(class="form-signin" action="?act=auth" method="POST")
         h2(class="form-signin-heading") Пожалуйста, введите
         div(class="alert alert-danger fade in", style = CorrectPas)
             button(type="button" class="close" data-dismiss="alert" aria-hidden="true")
             strong Неверный логин или пароль
         input(type="hidden" name="act" value="auth")
-        input(type="text", class="form-control", name="username", placeholder="Логин", required="" autofocus="")
+        input(type="text", class="form-control", name="email", placeholder="Логин", required="" autofocus="")
         input(type="password", class="form-control", name="password", placeholder="Пароль", required="")
         button(class="btn btn-lg btn-primary btn-block" type="submit") Войти
 
