@@ -1,4 +1,22 @@
-<h1>#{message}</h1>
-//<h2>#{error.status}</h2>
+<!DOCTYPE html>
 
-//<pre>#{error.stack}</pre>
+html
+    head
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        title Задачи
+        link(rel="stylesheet", href="/css/bootstrap.min.css")
+    style.
+        body {
+            background: #dedede;
+        }
+        .page-wrap{
+            min-height: 100vh;
+        }
+    body
+        .page-wrap.d-flex.flex-row.align-items-center
+            .container
+                .row.justify-content-center
+                    .col-md-12.text-center
+                        span.display-1.d-block #{status}
+                        .mb-4.lead #{message}
+                        a.btn.btn-link(href='/') Вернуться на главную страницу

@@ -25,19 +25,39 @@ module.exports = {
             if (err) {
                 next(err);
             } else {
-
-                if (userInfo != null && bcrypt.compareSync(req.body.password, userInfo.password)) {
-
-                    const refreshToken = jwt.sign({id: userInfo._id, userName: userInfo.name, status: userInfo.status}, req.app.get('secretKey'), {expiresIn: '30d'});
-                    const accessToken = jwt.sign({id: userInfo._id, userName: userInfo.name, status: userInfo.status}, req.app.get('secretKey'), {expiresIn: '5m'});
-                    res.cookie('cookieName', {userName: userInfo.name,status: userInfo.status, refreshToken: refreshToken, accessToken: accessToken}, {maxAge: 900000, httpOnly: true});
-                    //res.json({status: "success", message: "user found!!!", data: {user: userInfo, refreshToken: refreshToken, accessToken: accessToken}});
-                    res.redirect("/student/main");
-
+                if (userInfo !== null && bcrypt.compareSync(req.body.password, userInfo.password)) {
+                    const refreshToken = jwt.sign({id: userInfo._id, userName: userInfo.name, status: userInfo.status}, req.app.get('secretKey'), {expiresIn: '2d'});
+                    const accessToken = jwt.sign({id: userInfo._id, userName: userInfo.name, status: userInfo.status}, req.app.get('secretKey'), {expiresIn: '10m'});
+                    res.cookie('accessToken', {userName: userInfo.name,status: userInfo.status, accessToken: accessToken}, {maxAge: 600000, httpOnly: true});
+                    res.cookie('refreshToken', {userName: userInfo.name,status: userInfo.status, refreshToken: refreshToken}, {maxAge: 172800000, httpOnly: true});
+                    if(userInfo.status==="0"){
+                        res.redirect("/student/main");
+                    }else if(userInfo.status==="1"){
+                        res.redirect("/teacher/main");
+                    }else{
+                        res.render('error', {message: "Неверный тип пользователя", status: "500"});
+                    }
                 } else {
-
                     res.json({status: "error", message: "Invalid email/password!!!", data: null});
+                }
+            }
+        });
+    },
 
+    authenticateOnRefreshToken: function (req, res, next) {
+        console.log(req.body);
+        userModel.findOne({email: req.body.email}, function (err, userInfo) {
+            if (err) {
+                next(err);
+            } else {
+                if (userInfo !== null && bcrypt.compareSync(req.body.password, userInfo.password)) {
+                    const refreshToken = jwt.sign({id: userInfo._id, userName: userInfo.name, status: userInfo.status}, req.app.get('secretKey'), {expiresIn: '2d'});
+                    const accessToken = jwt.sign({id: userInfo._id, userName: userInfo.name, status: userInfo.status}, req.app.get('secretKey'), {expiresIn: '10m'});
+                    res.cookie('accessToken', {userName: userInfo.name,status: userInfo.status, accessToken: accessToken}, {maxAge: 600000, httpOnly: true});
+                    res.cookie('refreshToken', {userName: userInfo.name,status: userInfo.status, refreshToken: refreshToken}, {maxAge: 172800000, httpOnly: true});
+                    res.redirect("/student/main");
+                } else {
+                    res.json({status: "error", message: "Invalid email/password!!!", data: null});
                 }
             }
         });

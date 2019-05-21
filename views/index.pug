@@ -9,13 +9,11 @@ head
     script(src="js/jquery.min.js")
     script(src="js/bootstrap.min.js")
 body
-    //include inceludes/navbar
-//  script($(".alert").alert('close'))
 div(class="wrapper")
     h1(class="text-center") Система удаленной сдачи домашних работ
     br
     form(class="form-signin" action="?act=auth" method="POST")
-        h2(class="form-signin-heading") Пожалуйста, введите
+        h3(class="form-signin-heading") Пожалуйста, введите
         div(class="alert alert-danger fade in", style = CorrectPas)
             button(type="button" class="close" data-dismiss="alert" aria-hidden="true")
             strong Неверный логин или пароль

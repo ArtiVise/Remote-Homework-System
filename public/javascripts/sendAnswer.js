@@ -1,9 +1,9 @@
 this.uploadFile =  function(index) {
     //baseClass это this
-    var file = baseClass.allFiles[index];
+    let file = baseClass.allFiles[index];
 
     //Создаем объек FormData
-    var data = new FormData();
+    let data = new FormData();
     //Добавлем туда файл
     data.append('uploadFile', file.file);
 
@@ -16,7 +16,7 @@ this.uploadFile =  function(index) {
         processData: false,
         type: 'POST',
         success: function(response) {
-            var message = file.element.find('td.message');
+            let message = file.element.find('td.message');
             if(response.status === 'ok') {
                 message.html(response.text);
                 file.element.find('button.uploadButton').remove();
@@ -26,7 +26,7 @@ this.uploadFile =  function(index) {
             }
         },
         xhr: function() {
-            var xhr = $.ajaxSettings.xhr();
+            let xhr = $.ajaxSettings.xhr();
 
             if ( xhr.upload ) {
                 console.log('xhr upload');

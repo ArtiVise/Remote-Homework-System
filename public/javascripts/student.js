@@ -5,7 +5,7 @@
 
 //------------------------------------
 function createXmlHttpRequestObject(){
-    var xmlHttp;
+    let xmlHttp;
     try{
         xmlHttp=new XMLHttpRequest();
     }
@@ -29,14 +29,14 @@ function createXmlHttpRequestObject(){
 //-----------------------------
 function getXML(xmlHttp){
 // возвращает xml документ, если он пришёл и false в противном случае
-    var xmlDoc=false;
+    let xmlDoc=false;
 // проверка готовности результата
-    if(xmlHttp.readyState == 4){
-        if (xmlHttp.status == 200){
+    if(xmlHttp.readyState === 4){
+        if (xmlHttp.status === 200){
             // получить XML ответ сервера
             xmlDoc=xmlHttp.responseXML;
         } else {
-            if (xmlHttp.status == 404){
+            if (xmlHttp.status === 404){
                 alert("Request URL does not exist");
             } else {
                 alert("Error: status code is " + xmlHttp.status);
@@ -48,14 +48,14 @@ function getXML(xmlHttp){
 
 function getResponseText(xmlHttp){
 // возвращает текст отклика сервера на xmlHttpRequest
-    var txt=false;
+    let txt=false;
 // проверка готовности результата
-    if(xmlHttp.readyState == 4){
-        if (xmlHttp.status == 200){
+    if(xmlHttp.readyState === 4){
+        if (xmlHttp.status === 200){
             // получить XML ответ сервера
             txt=xmlHttp.responseText;
         } else {
-            if (xmlHttp.status == 404){
+            if (xmlHttp.status === 404){
                 alert("Request URL does not exist");
             } else {
                 alert("Error: status code is " + xmlHttp.status);
@@ -71,7 +71,7 @@ function Init(){
 //------------------------------------
 function Send(){
     xmlHttp.onreadystatechange=Receive;  // назначаем обработчик ответа сервера
-    var fullrequest = new FormData(document.forms.frm);
+    let fullrequest = new FormData(document.forms.frm);
     xmlHttp.open("POST","GetRes.php",true);
     xmlHttp.send(fullrequest);
     delete fullrequest;
