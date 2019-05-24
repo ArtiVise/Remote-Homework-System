@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+html
+    head
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        title #{title}
+        block link
+        link(rel='stylesheet', href='/stylesheets/main.css')
+        link(rel="stylesheet", href="/css/bootstrap.min.css")
+        script(src="/js/jquery.min.js")
+        script(src="/js/bootstrap.min.js")
+    body
+        nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
+            a.navbar-brand(href='#') Система удаленной сдачи работ
+            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
+                span.navbar-toggler-icon
+            #navbarCollapse.collapse.navbar-collapse
+                ul.navbar-nav.mr-auto
+                    - if(authenticated===0)
+                        li.nav-item.active
+                            a.nav-link(href='/teacher/main') Ответы
+                    - else
+                        li.nav-item
+                            a.nav-link(href='/teacher/main') Ответы
+                    - if(authenticated===1)
+                        li.nav-item.active
+                            a.nav-link(href='/teacher/subjects') Предметы
+                    - else
+                        li.nav-item
+                            a.nav-link(href='/teacher/subjects') Предметы
+                    - if(authenticated===2)
+                        li.nav-item.active
+                            a.nav-link(href='/teacher/tasks') Задачи
+                    - else
+                        li.nav-item
+                            a.nav-link(href='/teacher/tasks') Задачи
+                    - if(authenticated===3)
+                        li.nav-item.active
+                            a.nav-link(href='/teacher/groups') Группы
+                    - else
+                        li.nav-item
+                            a.nav-link(href='/teacher/groups') Группы
+                form(class="navbar-form navbar-right" role="form")
+                    Name.text-white
+                        | Добро пожаловать, преподаватель #{TeacherName} &nbsp
+                    input(type="hidden" name="act" value="logout")
+                    button(type="submit" class="btn btn-success") Выйти
+        block main

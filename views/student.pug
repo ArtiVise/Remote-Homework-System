@@ -2,35 +2,35 @@
 
 html
     head
-        meta(name="viewport", content="width=device-width, initial-scale=1")
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
         title Задачи
-        link(rel='stylesheet', href='/stylesheets/student.css')
+        link(rel='stylesheet', href='/stylesheets/main.css')
         link(rel="stylesheet", href="/css/bootstrap.min.css")
     body
-        header
-            nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
-                a.navbar-brand(href='#') Система удаленной сдачи работ
-                button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
-                    span.navbar-toggler-icon
-                #navbarCollapse.collapse.navbar-collapse
-                    ul.navbar-nav.mr-auto
-                        li.nav-item.active
-                            a.nav-link(href='/student/main')
-                                | Задачи
-                                span.sr-only (current)
-                    form(class="navbar-form navbar-right" role="form")
-                        Name
-                            | Добро пожаловать, студент #{StudentName} &nbsp
-                        input(type="hidden" name="act" value="logout")
-                        button(type="submit" class="btn btn-success") Выйти
-        div(class="container")
-            .panel.panel-info
-                .panel-heading Список задач
-                .panel-body
+        nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
+            a.navbar-brand(href='#') Система удаленной сдачи работ
+            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
+                span.navbar-toggler-icon
+            #navbarCollapse.collapse.navbar-collapse
+                ul.navbar-nav.mr-auto
+                    li.nav-item.active
+                        a.nav-link(href='/student/main')
+                            | Задачи
+                            span.sr-only (current)
+                form(class="navbar-form navbar-right" role="form")
+                    Name.text-white
+                        | Добро пожаловать, студент #{StudentName} &nbsp
+                    input(type="hidden" name="act" value="logout")
+                    button(type="submit" class="btn btn-success") Выйти
+        main.container(role='main')
+            div.card
+                div.card-header.bg-primary.text-white Список задач
+                div.card-body
                     form()
                         |Предмет:
                         |&nbsp;
-                        select(name="subjects" onChange="combo(this, 'theinput')")
+                        select(name="subjects" onChange="combo(this)")
                             each data in subjects
                                 if (subjectsName === data.Name)
                                     option(selected) #{data.Name}
@@ -43,12 +43,10 @@ html
                         tr
                             th Номер
                             th Название
-                            //th Статус проверки
                         each data in body
                             tr(class="colors" id=data.id onclick='RowClick(this)')
                                 td #{data.Number}
                                 td #{data.Name}
-                                //td #{data.Status}
                     div(class="container")
                         form()
                             input(type="hidden" name="act" value="getTask")
@@ -59,6 +57,9 @@ html
     script(src="/js/bootstrap.min.js")
     script.
         var a = 0;
+        function combo(subject) {
+            console.log(subject.value);
+        }
         function RowClick(row) {
             //console.log(row.id);
             a = row.id;

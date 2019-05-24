@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node clusterMaster.js --trace-sync-io"
   },
   "dependencies": {
     "bcrypt": "^3.0.6",
@@ -35,6 +35,8 @@
     "request": "^2.88.0",
     "sequelize": "^5.8.6",
     "serve-favicon": "^2.5.0",
-    "tar": "^4.4.8"
+    "socket.io": "^2.2.0",
+    "tar": "^4.4.8",
+    "vm2": "^3.8.1"
   }
 }

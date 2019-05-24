@@ -2,7 +2,7 @@ extends ./base
 block main
     main.container(role='main')
         div.card
-            div.card-header.bg-primary.text-white Список задач
+            div.card-header.bg-primary.text-white Список ответов
             div.card-body
                 form()
                     | Предмет:
@@ -15,45 +15,35 @@ block main
                                 option #{data.Name}
                     | &nbsp;
                     button(type="submit" class="btn btn-primary") Открыть список ответов
+
                 br
                 table(class="table table-bordered")
                     tr
-                        th Номер
+                        th Группа
+                        th Студент
                         th Название задачи
-                        th Прикреплённые файлы
-                    each data in tasks
+                        th Дата отправления
+                        th Ссылка на ответ
+                        th Статус проверки
+                        th Проверил
+                        th Последний комментарий
+                    each data in body
                         tr(class="colors" id=data.id onclick='RowClick(this)')
-                            td #{data.Number}
-                            td #{data.Name}
-                            td #{data.TaskFiles}
-                button.btn.btn-primary(type="submit") Удалить
-                | &nbsp;
-                | &nbsp;
-                | &nbsp;
-                b Действия с прикреплённым файлом:
-                | &nbsp;
-                button.btn.btn-primary(type="submit") Добавить
-                button.btn.btn-primary(type="submit") Удалить
-                button.btn.btn-primary(type="submit") Скачать
-    p
-    main.container(role='main')
-        div.card
-            div.card-header.bg-primary.text-white Редактирование задачи
-            div.card-body
-                form(class="form-horizontal")
-                    input(type="hidden" name="act" value="getDecision")
-                    input(type="hidden" name="ActDecision" value="None")
-                    input(type="hidden" name="ActDecision" value="None")
-                    div(class="form-group")
-                        label(class="col-sm-2 control-label") Название задания:
-                        div
-                            input(name="TaskName" class="form-control" )
-                        p
-                        label(class="col-sm-2 control-label") Текст задания:
-                        div
-                            textarea(class="form-control" rows="3")
-                    button.btn.btn-primary(type="submit" onclick='RowClick1(this)') Добавить
-                    button.btn.btn-primary(type="submit") Изменить
+                            td #{data.Groups}
+                            td #{data.Student}
+                            td #{data.Task}
+                            td #{data.TimeAnswer}
+                            td #{data.DecisionLink}
+                            td #{data.Status}
+                            td #{data.Teacher}
+                            td #{data.Comments}
+                div(class="container")
+                    form()
+                        input(type="hidden" name="act" value="getDecision")
+                        input(type="hidden" name="ActDecision" value="None")
+                        button(type="submit" class="btn btn-primary" onclick='RowClick1(this)') Скачать ответ
+                        button(type="submit" class="btn btn-primary") Изменить оценку
+                        button(type="submit" class="btn btn-primary") Оставить комментарий
     script(type="text/javascript", src="/javascripts/sendAnswer.js")
     script.
         var a = 0;

@@ -10,7 +10,8 @@ router.get('/main', function(req, res) {
                     res.render('Teacher', {
                         TeacherName: req.body.userName,
                         subjects: subjects,
-                        body: tasks
+                        body: tasks,
+                        authenticated: 0
                     });
                 }
             )
@@ -21,7 +22,8 @@ router.get('/main', function(req, res) {
                             TeacherName: req.body.userName,
                             subjects: subjects,
                             subjectsName: req.query.subjects,
-                            body: tasks
+                            body: tasks,
+                            authenticated: 0
                         });
                     }
                 )
@@ -34,7 +36,8 @@ router.get('/subjects', function(req, res) {
     ind.GetTechSubjects().then(subjects => {
         res.render('TechSubjects', {
             TeacherName: req.body.userName,
-            subjects: subjects
+            subjects: subjects,
+            authenticated: 1
         });
     });
 });
@@ -45,7 +48,9 @@ router.get('/tasks', function(req, res) {
             ind.GetTechTasks(subjects[0].id).then(tasks => {
                     res.render('TechTasks', {TeacherName: req.body.userName,
                         subjects: subjects,
-                        tasks: tasks});
+                        tasks: tasks,
+                        authenticated: 2
+                    });
                 }
             )
         } else {
@@ -55,7 +60,8 @@ router.get('/tasks', function(req, res) {
                             TeacherName: req.body.userName,
                             subjects: subjects,
                             subjectsName: req.query.subjects,
-                            tasks: tasks
+                            tasks: tasks,
+                            authenticated: 2
                         });
                     }
                 )
@@ -70,7 +76,8 @@ router.get('/groups', function(req, res) {
             res.render('TechGroups', {
                 TeacherName: req.body.userName,
                 Groups: Groups,
-                Students:Students
+                Students:Students,
+                authenticated: 3
             });
         });
     });

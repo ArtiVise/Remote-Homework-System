@@ -4,8 +4,65 @@ html
 head
     meta(name="viewport", content="width=device-width, initial-scale=1")
     title #{title}
-    link(rel='stylesheet', href='/stylesheets/task.css')
     link(rel="stylesheet", href="/css/bootstrap.min.css")
+    link(rel='stylesheet', href='/stylesheets/main.css')
+body
+    nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
+        a.navbar-brand(href='#') Система удаленной сдачи работ
+        button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
+            span.navbar-toggler-icon
+        #navbarCollapse.collapse.navbar-collapse
+            ul.navbar-nav.mr-auto
+                li.nav-item
+                    a.nav-link(href='/student/main') Задачи
+                li.nav-item.active
+                    a.nav-link() > Просмотр задачи
+            form(class="navbar-form navbar-right" role="form")
+                Name.text-white
+                    | Добро пожаловать, студент #{StudentName} &nbsp
+                input(type="hidden" name="act" value="logout")
+                button(type="submit" class="btn btn-success") Выйти
+    main.container(role='main')
+        div.card
+            div.card-header.bg-primary.text-white Формулировка задачи
+            div.card-body
+                div(class="starter-template")
+                    form
+                        h1 #{Name}
+                        p(class="lead") #{Text}
+                        p(class="lead")
+                            |Ссылка на файлы задания:
+                            a(href="/student/taskfile"+"?link="+Link) #{Link}
+    p
+    main.container(role='main')
+        div.card
+            div.card-header.bg-primary.text-white Ответы
+            div.card-body
+                h4 Загрузка файлов ответа
+                form(action='/student/upload', enctype='multipart/form-data', method='post')
+                    input(type='file', name='filetoupload' )
+                    button(type='submit', class="btn btn-primary") Загрузить ответ
+                | &nbsp;
+                table(class="table table-bordered")
+                    tr
+                        th Дата отправления
+                        th Cсылка на ответ
+                        th Статус проверки
+                        th Проверил
+                        th Последний комментарий
+                    each data in ListDecisions
+                        tr(class="colors" id=data.id onclick='RowClick(this)')
+                            td #{data.TimeAnswer}
+                            td #{data.Link}
+                            td #{data.Status}
+                            td #{data.Teacher}
+                            td #{data.Comments}
+                div(class="container " )
+                    form()
+                        input(type="hidden" name="act" value="getDecision")
+                        input(type="hidden" name="ActDecision" value="None" )
+                        button(type="submit" class="btn btn-primary" onclick='RowClick1(this)') Скачать ответ
+                        button(type="submit" class="btn btn-primary" ) Посмотреть комментарий
     script(src="/js/jquery.min.js")
     script(src="/js/bootstrap.min.js")
     script(type="text/javascript", src="/javascripts/sendAnswer.js")
@@ -35,61 +92,3 @@ head
             });
 
         });
-body
-    header
-        nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
-            a.navbar-brand(href='#') Система удаленной сдачи работ
-            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
-                span.navbar-toggler-icon
-            #navbarCollapse.collapse.navbar-collapse
-                ul.navbar-nav.mr-auto
-                    li.nav-item
-                        a.nav-link(href='/student/main') Задачи
-                    li.nav-item.active
-                        a.nav-link(href='#')
-                            | Просмотр задачи
-                            span.sr-only (current)
-                form(class="navbar-form navbar-right" role="form")
-                    Name
-                        | Добро пожаловать, студент #{StudentName} &nbsp
-                    input(type="hidden" name="act" value="logout")
-                    button(type="submit" class="btn btn-success") Выйти
-    div(class="container")
-        .panel.panel-info
-            .panel-heading Формулировка задачи
-            .panel-body
-                div(class="starter-template")
-                    form
-                        h1 #{Name}
-                        p(class="lead") #{Text}
-                        p(class="lead")
-                            |Ссылка на файлы задания:
-                            a(href="/taskfile"+"?link="+Link) #{Link}
-        .panel.panel-info
-            .panel-heading Ответы
-            .panel-body
-                h4 Загрузка файлов ответа
-                form(action='/upload', enctype='multipart/form-data', method='post')
-                    input(type='file', name='filetoupload' )
-                    button(type='submit', class="btn btn-primary") Загрузить ответ
-                | &nbsp;
-                table(class="table table-bordered")
-                    tr
-                        th Дата отправления
-                        th Cсылка на ответ
-                        th Статус проверки
-                        th Проверил
-                        th Последний комментарий
-                    each data in ListDecisions
-                        tr(class="colors" id=data.id onclick='RowClick(this)')
-                            td #{data.TimeAnswer}
-                            td #{data.Link}
-                            td #{data.Status}
-                            td #{data.Teacher}
-                            td #{data.Comments}
-                div(class="container " )
-                    form()
-                        input(type="hidden" name="act" value="getDecision")
-                        input(type="hidden" name="ActDecision" value="None" )
-                        button(type="submit" class="btn btn-primary" onclick='RowClick1(this)') Скачать ответ
-                        button(type="submit" class="btn btn-primary" ) Посмотреть комментарий

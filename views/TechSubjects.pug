@@ -1,13 +1,27 @@
-<!DOCTYPE html>
-
-html
-head
-    meta(name="viewport", content="width=device-width, initial-scale=1")
-    title #{title}
-    link(rel='stylesheet', href='/stylesheets/TechSubjects.css')
-    link(rel="stylesheet", href="/css/bootstrap.min.css")
-    script(src="/js/jquery.min.js")
-    script(src="/js/bootstrap.min.js")
+extends ./base
+block main
+    main.container(role='main')
+        div.card
+            div.card-header.bg-primary.text-white Список предметов
+            div.card-body
+                table(class="table table-bordered")
+                    tr
+                        th Номер
+                        th Название предмета
+                    each data in subjects
+                        tr(class="colors" id=data.id onclick='RowClick(this)')
+                            td #{data.num}
+                            td #{data.Name}
+                div(class="container")
+                    form()
+                        input(type="hidden" name="act" value="getDecision")
+                        input(type="hidden" name="ActDecision" value="None")
+                        p
+                            b Название предмета:
+                            input(name="SubjectName")
+                        button(type="submit" class="btn btn-primary" onclick='RowClick1(this)') Добавить
+                        button(type="submit" class="btn btn-primary") Изменить
+                        button(type="submit" class="btn btn-primary") Удалить
     script(type="text/javascript", src="/javascripts/sendAnswer.js")
     script.
         var a = 0;
@@ -35,47 +49,3 @@ head
             });
 
         });
-body
-    nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
-        a.navbar-brand(href='#') Система удаленной сдачи работ
-        button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
-            span.navbar-toggler-icon
-        #navbarCollapse.collapse.navbar-collapse
-            ul.navbar-nav.mr-auto
-                li.nav-item
-                    a.nav-link(href='/teacher/main') Ответы
-                li.nav-item.active
-                    a.nav-link(href='/teacher/subjects')
-                        | Предметы
-                        span.sr-only (current)
-                li.nav-item
-                    a.nav-link(href='/teacher/tasks') Задачи
-                li.nav-item
-                    a.nav-link(href='/teacher/groups') Группы
-            form(class="navbar-form navbar-right" role="form")
-                Name
-                    | Добро пожаловать, преподаватель #{TeacherName} &nbsp
-                input(type="hidden" name="act" value="logout")
-                button(type="submit" class="btn btn-success") Выйти
-    div(class="container")
-        .panel.panel-info
-            .panel-heading Список предметов
-            .panel-body
-                table(class="table table-bordered")
-                    tr
-                        th Номер
-                        th Название предмета
-                    each data in subjects
-                        tr(class="colors" id=data.id onclick='RowClick(this)')
-                            td #{data.num}
-                            td #{data.Name}
-                div(class="container")
-                    form()
-                        input(type="hidden" name="act" value="getDecision")
-                        input(type="hidden" name="ActDecision" value="None")
-                        p
-                            b Название предмета:
-                            input(name="SubjectName")
-                        button(type="submit" class="btn btn-primary" onclick='RowClick1(this)') Добавить
-                        button(type="submit" class="btn btn-primary") Изменить
-                        button(type="submit" class="btn btn-primary") Удалить

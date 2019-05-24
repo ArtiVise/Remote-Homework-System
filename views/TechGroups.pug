@@ -1,67 +1,9 @@
-<!DOCTYPE html>
-
-html
-head
-    meta(name="viewport", content="width=device-width, initial-scale=1")
-    title #{title}
-    link(rel='stylesheet', href='/stylesheets/TechTasks.css')
-    link(rel="stylesheet", href="/css/bootstrap.min.css")
-    script(src="/js/jquery.min.js")
-    script(src="/js/bootstrap.min.js")
-    script(type="text/javascript", src="/javascripts/sendAnswer.js")
-    script.
-        var a = 0;
-        function RowClick(row) {
-            //console.log(row.id);
-            a = row.id;
-            //row.style.background = "blue";
-            //alert(row);
-        }
-        function RowClick1(row) {
-            var elems = document.getElementsByName('ActDecision')[0];
-            elems.value = a;
-            console.log(elems.value);
-        }
-        $(document).ready(function () {
-            $(".colors:last").css("background-color", "#b0eeaa");
-            var tr_clr = $(".colors:last").css("background-color");
-            $(".colors:last").css("background-color", "white");
-            $(".colors").click(function () {
-                $(".colors").css("background-color", "white");
-                $(this).css("background-color", tr_clr);
-                //if ($(this).css("background-color") != tr_clr)
-                //    $(this).css("background-color", tr_clr)
-                //else $(this).css("background-color", "white")
-            });
-
-        });
-body
-    header
-        nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
-            a.navbar-brand(href='#') Система удаленной сдачи работ
-            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
-                span.navbar-toggler-icon
-            #navbarCollapse.collapse.navbar-collapse
-                ul.navbar-nav.mr-auto
-                    li.nav-item
-                        a.nav-link(href='/teacher/main') Ответы
-                    li.nav-item
-                        a.nav-link(href='/teacher/subjects') Предметы
-                    li.nav-item
-                        a.nav-link(href='/teacher/tasks') Задачи
-                    li.nav-item.active
-                        a.nav-link(href='/teacher/groups')
-                            | Группы
-                            span.sr-only (current)
-                form(class="navbar-form navbar-right" role="form")
-                    Name
-                        | Добро пожаловать, преподаватель #{TeacherName} &nbsp
-                    input(type="hidden" name="act" value="logout")
-                    button(type="submit" class="btn btn-success") Выйти
-    div(class="container")
-        .panel.panel-info
-            .panel-heading Список групп
-            .panel-body
+extends ./base
+block main
+    main.container(role='main')
+        div.card
+            div.card-header.bg-primary.text-white Список групп
+            div.card-body
                 table(class="table table-bordered")
                     tr
                         th Номер
@@ -120,3 +62,30 @@ body
                 button.btn.btn-primary(type="submit") Добавить
                 button.btn.btn-primary(type="submit") Изменить
                 button.btn.btn-primary(type="submit") Удалить
+    script(type="text/javascript", src="/javascripts/sendAnswer.js")
+    script.
+        var a = 0;
+        function RowClick(row) {
+            //console.log(row.id);
+            a = row.id;
+            //row.style.background = "blue";
+            //alert(row);
+        }
+        function RowClick1(row) {
+            var elems = document.getElementsByName('ActDecision')[0];
+            elems.value = a;
+            console.log(elems.value);
+        }
+        $(document).ready(function () {
+            $(".colors:last").css("background-color", "#b0eeaa");
+            var tr_clr = $(".colors:last").css("background-color");
+            $(".colors:last").css("background-color", "white");
+            $(".colors").click(function () {
+                $(".colors").css("background-color", "white");
+                $(this).css("background-color", tr_clr);
+                //if ($(this).css("background-color") != tr_clr)
+                //    $(this).css("background-color", tr_clr)
+                //else $(this).css("background-color", "white")
+            });
+
+        });

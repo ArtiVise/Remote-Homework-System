@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>Monitor Cluster</title>
+        <!-- Load the Socket.io networking library -->
+        <script src="/socket.io/socket.io.js"></script>
+        <style type="text/css">
+            body,html {
+                margin: 0px;
+                position: relative;
+                background-color: #9FC7E1;
+            }
+            canvas { /* Center the canvas */
+                margin:auto;
+                /*border: 1px solid black;*/
+            }
+            table,tr,td{
+                border:1px solid black;
+            }
+            p{
+                margin: 4px;
+            }
+            #infoServers td{
+                text-align: center;
+            }
+            #infoCluster td{
+                text-align: center;
+            }
+            .container{
+                max-width: 1080px;
+                padding: 0 15px;
+                margin:0 auto;
+            }
+            .flex-container {
+                display: flex;
+                flex-wrap:  wrap;
+            }
+            .flex-item {
+                text-align:center;
+                font-size: 1.1em;
+                padding: 1.5em;
+            }
+        </style>
+    </head>
+    <body>
+        <p>
+            <b>Потребление памяти балансером: </b>
+            <b id="memory">0</b>
+        </p>
+        <div class="flex-container">
+            <div id="infoServers" class="flex-item container"> </div>
+            <div id="infoCluster" class="flex-item container"> </div>
+        </div>
+
+    </body>
+    <script defer type="text/javascript">
+        var memoryField = document.getElementById("memory");
+        var infoServersField = document.getElementById("infoServers");
+        var infoClusterField = document.getElementById("infoCluster");
+
+        var socket = io.connect(
+            {
+                'forceNew': true,
+                'reconnection': true,
+                'reconnectionDelay': 1000,
+                'reconnectionDelayMax' : 5000,
+                'reconnectionAttempts': 5
+            });
+        /**Запрос информации о кластере**/
+        socket.emit('serverInfo');
+
+        /**Получение информации о кластере**/
+        socket.on('answerServerInfo',function(memory,gamersCount,cpuCount,workersInfo,infoCPU) {
+            /**Заполнение информации о процессоре**/
+            var tableInfoCPU = document.createElement("table");
+            var headerInfoCPU = tableInfoCPU.insertRow(-1);
+            headerInfoCPU.insertCell(-1).innerHTML="Номер потока";
+            headerInfoCPU.insertCell(-1).innerHTML="Загрузка пользователем";
+            headerInfoCPU.insertCell(-1).innerHTML="Загрузка системой";
+            headerInfoCPU.insertCell(-1).innerHTML="Свободно";
+            for(var i=0;i<cpuCount;i++) {
+                var rowInfoCPU = tableInfoCPU.insertRow(-1);
+                for(var j=0;j<4;j++) {
+                    var cellInfoCPU = rowInfoCPU.insertCell(-1);
+                    if (infoCPU[i] !== undefined) {
+                        switch (j) {
+                            case 0:
+                                cellInfoCPU.innerHTML = infoCPU[i].numberCPU;
+                                break;
+                            case 1:
+                                cellInfoCPU.innerHTML = infoCPU[i].userCPU + "%";
+                                break;
+                            case 2:
+                                cellInfoCPU.innerHTML = infoCPU[i].sysCPU + "%";
+                                break;
+                            case 3:
+                                cellInfoCPU.innerHTML = infoCPU[i].idleCPU + "%";
+                                break;
+                        }
+                    }
+                }
+            }
+            infoServersField.replaceChild(tableInfoCPU,infoServersField.lastChild);
+
+            /**Заполнение информации о кластере**/
+            var table1 = document.createElement("table");
+            var header1 = table1.insertRow(-1);
+            var allUseMemory=0,allAllocatedMemory=0,allGamers=0;
+            header1.insertCell(-1).innerHTML="PID сервера";
+            header1.insertCell(-1).innerHTML="Порт сервера";
+            header1.insertCell(-1).innerHTML="Использует оперативной памяти";
+            header1.insertCell(-1).innerHTML="Выделено оперативной памяти";
+            header1.insertCell(-1).innerHTML="Кол-во запросов";
+            for(i=0;i<cpuCount;i++){
+                var row1 = table1.insertRow(-1);
+                for(j=0;j<5;j++){
+                    var cell1=row1.insertCell(-1);
+                    if(workersInfo[i]!==undefined){
+                        switch (j){
+                            case 0:
+                                cell1.innerHTML=workersInfo[i].pid;
+                                break;
+                            case 1:
+                                cell1.innerHTML=workersInfo[i].port;
+                                break;
+                            case 2:
+                                allUseMemory+=workersInfo[i].useMemory;
+                                cell1.innerHTML=workersInfo[i].useMemory + " MB";
+                                break;
+                            case 3:
+                                allAllocatedMemory+=workersInfo[i].allocatedMemory;
+                                cell1.innerHTML=workersInfo[i].allocatedMemory + " MB";
+                                break;
+                            case 4:
+                                allGamers+=workersInfo[i].countUser;
+                                cell1.innerHTML=workersInfo[i].countUser;
+                                break;
+                        }
+                    }
+                }
+            }
+            row1 = table1.insertRow(-1);
+            row1.insertCell(-1);
+            row1.insertCell(-1).innerHTML="Всего";
+            row1.insertCell(-1).innerHTML=Math.round(allUseMemory * 100) / 100 + " MB";
+            row1.insertCell(-1).innerHTML=Math.round(allAllocatedMemory * 100) / 100 + " MB";
+            row1.insertCell(-1).innerHTML=allGamers+"";
+            infoClusterField.replaceChild(table1,infoClusterField.lastChild);
+            memoryField.innerHTML = memory + " MB";
+            setTimeout(function(){socket.emit('serverInfo');}, 1000);
+        });
+    </script>
+</html>
