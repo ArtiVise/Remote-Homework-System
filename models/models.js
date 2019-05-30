@@ -3,8 +3,8 @@
 let Sequelize = require('sequelize'); //Подключение библиотеки ORM
 let mysql = require('mysql'); //Подключение библиотеки для работы с базой данных на MySQL
 
-//Создание подключения к базе данных
-let sequelize = new Sequelize('new_schema', 'root','123456',{
+//Создание подключения к базе данных(Схема, логин, пароль)
+let sequelize = new Sequelize('new_schema', 'student','student',{
     host: 'localhost',
     port: 3305,
     dialect: 'mysql',

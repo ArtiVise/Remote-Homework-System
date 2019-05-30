@@ -6,6 +6,9 @@ head
     title #{title}
     link(rel="stylesheet", href="/css/bootstrap.min.css")
     link(rel='stylesheet', href='/stylesheets/main.css')
+    script(src="/js/jquery.min.js")
+    script(src="/js/bootstrap.min.js")
+    script(src="/socket.io/socket.io.js")
 body
     nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
         a.navbar-brand(href='#') Система удаленной сдачи работ
@@ -63,10 +66,16 @@ body
                         input(type="hidden" name="ActDecision" value="None" )
                         button(type="submit" class="btn btn-primary" onclick='RowClick1(this)') Скачать ответ
                         button(type="submit" class="btn btn-primary" ) Посмотреть комментарий
-    script(src="/js/jquery.min.js")
-    script(src="/js/bootstrap.min.js")
     script(type="text/javascript", src="/javascripts/sendAnswer.js")
     script.
+        var socket = io.connect(
+            {
+                'forceNew': true,
+                'reconnection': true,
+                'reconnectionDelay': 1000,
+                'reconnectionDelayMax': 5000,
+                'reconnectionAttempts': 5
+            });
         var a = 0;
         function RowClick(row) {
             //console.log(row.id);

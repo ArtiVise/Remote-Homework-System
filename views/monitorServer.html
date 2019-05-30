@@ -71,7 +71,7 @@
         socket.emit('serverInfo');
 
         /**Получение информации о кластере**/
-        socket.on('answerServerInfo',function(memory,gamersCount,cpuCount,workersInfo,infoCPU) {
+        socket.on('answerServerInfo',function(memory,cpuCount,workersInfo,infoCPU) {
             /**Заполнение информации о процессоре**/
             var tableInfoCPU = document.createElement("table");
             var headerInfoCPU = tableInfoCPU.insertRow(-1);
@@ -106,15 +106,19 @@
             /**Заполнение информации о кластере**/
             var table1 = document.createElement("table");
             var header1 = table1.insertRow(-1);
-            var allUseMemory=0,allAllocatedMemory=0,allGamers=0;
+            var allUseMemory=0;
+            var allAllocatedMemory=0;
+            var allGamers=0;
+            var allConnection=0;
             header1.insertCell(-1).innerHTML="PID сервера";
             header1.insertCell(-1).innerHTML="Порт сервера";
             header1.insertCell(-1).innerHTML="Использует оперативной памяти";
             header1.insertCell(-1).innerHTML="Выделено оперативной памяти";
-            header1.insertCell(-1).innerHTML="Кол-во запросов";
+            header1.insertCell(-1).innerHTML="Кол-во пользователей";
+            header1.insertCell(-1).innerHTML="Кол-во соединений";
             for(i=0;i<cpuCount;i++){
                 var row1 = table1.insertRow(-1);
-                for(j=0;j<5;j++){
+                for(j=0;j<6;j++){
                     var cell1=row1.insertCell(-1);
                     if(workersInfo[i]!==undefined){
                         switch (j){
@@ -136,6 +140,10 @@
                                 allGamers+=workersInfo[i].countUser;
                                 cell1.innerHTML=workersInfo[i].countUser;
                                 break;
+                            case 5:
+                                allConnection+=workersInfo[i].countConnection;
+                                cell1.innerHTML=workersInfo[i].countConnection;
+                                break;
                         }
                     }
                 }
@@ -146,6 +154,7 @@
             row1.insertCell(-1).innerHTML=Math.round(allUseMemory * 100) / 100 + " MB";
             row1.insertCell(-1).innerHTML=Math.round(allAllocatedMemory * 100) / 100 + " MB";
             row1.insertCell(-1).innerHTML=allGamers+"";
+            row1.insertCell(-1).innerHTML=allConnection+"";
             infoClusterField.replaceChild(table1,infoClusterField.lastChild);
             memoryField.innerHTML = memory + " MB";
             setTimeout(function(){socket.emit('serverInfo');}, 1000);

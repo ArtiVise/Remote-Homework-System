@@ -4,19 +4,18 @@ html
 head
     meta(name="viewport" content="width=device-width, initial-scale=1")
     title #{title}
-    link(rel='stylesheet', href='stylesheets/index.css')
-    link(rel="stylesheet", href="css/bootstrap.min.css")
+    link(rel='stylesheet', href='/stylesheets/index.css')
+    link(rel="stylesheet", href="/css/bootstrap.min.css")
     script(src="/js/jquery.min.js")
     script(src="/js/bootstrap.min.js")
 body
     div(class="wrapper")
         h1(class="text-center") Система удаленной сдачи домашних работ
         br
-        form(class="form-signin" action="?act=auth" method="POST")
+        form(class="form-signin" method="POST")
             h3(class="form-signin-heading") Пожалуйста, введите
-            div(class="alert alert-danger fade in", style = CorrectPas)
-                button(type="button" class="close" data-dismiss="alert" aria-hidden="true")
-                strong Неверный логин или пароль
+            div(class="alert alert-danger in", style = CorrectPas)
+                strong #{errorText}
             input(type="hidden" name="act" value="auth")
             input(type="text", class="form-control", name="email", placeholder="Логин", required="" autofocus="")
             input(type="password", class="form-control", name="password", placeholder="Пароль", required="")

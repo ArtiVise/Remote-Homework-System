@@ -47,7 +47,7 @@ router.get('/main', function(req, res) {
 router.get('/task/:idTask', function(req, res) {
     if (req.params.idTask !== -1) {
         ind.GetTask(req.params.idTask).then(tasks => {
-            if (tasks !== '') {
+            if (tasks.length !== 0) {
                 ind.GetTaskFiles(req.params.idTask).then(files => {
                     let filelink = '1';
                     console.log(files.length);

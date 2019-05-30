@@ -38,30 +38,30 @@ module.exports = {
                         res.render('error', {message: "Неверный тип пользователя", status: "500"});
                     }
                 } else {
-                    res.json({status: "error", message: "Invalid email/password!!!", data: null});
+                    res.render('index', { title: 'Авторизация' ,CorrectPas: '',errorText:"Неверный логин или пароль"});
                 }
             }
         });
     },
 
-    authenticateMySQL: function (req, res, next) {
+    authenticateMySQL: function (req, res) {
         ind.Autorization(req.body.email,req.body.password).then(data => {
             if(data[0].flag === 1){
                 //Заполнение данных сессии для студента
-                const refreshToken = jwt.sign({id: data[0].id, userName: data[0].tmp, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '2d'});
-                const accessToken = jwt.sign({id: data[0].id, userName: data[0].tmp, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '10m'});
-                res.cookie('accessToken', {userName: data[0].tmp,status: data[0].flag, accessToken: accessToken}, {maxAge: 600000, httpOnly: true});
-                res.cookie('refreshToken', {userName: data[0].tmp,status: data[0].flag, refreshToken: refreshToken}, {maxAge: 172800000, httpOnly: true});
-                res.redirect("/student/main");
+                const refreshToken = jwt.sign({id: data[0].id, userName: data[0].tmp, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '300000'});
+                const accessToken = jwt.sign({id: data[0].id, userName: data[0].tmp, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '172800000'});
+                res.cookie('accessToken', {accessToken: accessToken}, {maxAge: 300000, httpOnly: true});
+                res.cookie('refreshToken', {refreshToken: refreshToken}, {maxAge: 172800000, httpOnly: true});
+                return res.redirect("/student/main");
             }else if(data[0].flag === 2){
                 //Заполнение данных сессии для преподавателя
-                const refreshToken = jwt.sign({id: data[0].id2, userName: data[0].tmp2, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '2d'});
-                const accessToken = jwt.sign({id: data[0].id2, userName: data[0].tmp2, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '10m'});
-                res.cookie('accessToken', {userName: data[0].tmp2,status: data[0].flag, accessToken: accessToken}, {maxAge: 600000, httpOnly: true});
-                res.cookie('refreshToken', {userName: data[0].tmp2,status: data[0].flag, refreshToken: refreshToken}, {maxAge: 172800000, httpOnly: true});
-                res.redirect("/teacher/main");
+                const refreshToken = jwt.sign({id: data[0].id2, userName: data[0].tmp2, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '300000'});
+                const accessToken = jwt.sign({id: data[0].id2, userName: data[0].tmp2, status: data[0].flag}, req.app.get('secretKey'), {expiresIn: '172800000'});
+                res.cookie('accessToken', {accessToken: accessToken}, {maxAge: 300000, httpOnly: true});
+                res.cookie('refreshToken', {refreshToken: refreshToken}, {maxAge: 172800000, httpOnly: true});
+                return res.redirect("/teacher/main");
             }else{
-                res.render('index', { title: 'Авторизация' ,CorrectPas: ''}); //Рендеринг страницы авторизации
+                return res.render('index', { title: 'Авторизация' ,CorrectPas: '',errorText:"Неверный логин или пароль"}); //Рендеринг страницы авторизации
             }
         });
     },

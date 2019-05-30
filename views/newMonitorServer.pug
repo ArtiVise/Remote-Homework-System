@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+html
+    head
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+        title Панель администратора
+        link(rel='stylesheet', href='/stylesheets/main.css')
+        link(rel="stylesheet", href="/css/bootstrap.min.css")
+        link(rel='stylesheet', href='stylesheets/style-205.css')
+        link(rel='stylesheet', type="text/css", href='https://rawgit.com/gionkunz/chartist-js/master/dist/chartist.min.css')
+        script(src="/js/jquery.min.js")
+        script(src="/js/bootstrap.min.js")
+        script(src="/socket.io/socket.io.js")
+    body
+        nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
+            a.navbar-brand(href='#') Система удаленной сдачи работ
+            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarCollapse', aria-controls='navbarCollapse', aria-expanded='false', aria-label='Toggle navigation')
+                span.navbar-toggler-icon
+            #navbarCollapse.collapse.navbar-collapse
+                ul.navbar-nav.mr-auto
+                form(class="navbar-form navbar-right" role="form")
+                    Name.text-white
+                        | Добро пожаловать, #{StudentName} &nbsp
+                    input(type="hidden" name="act" value="logout")
+                    button(type="submit" class="btn btn-success") Выйти
+        main.container(role='main')
+            h3
+                a Информация о системе
+            .row
+                .col-md-6.col-sm-6.col-xs-6.col-mob
+                    .card.mb-4.box-shadow
+                        .card-header.h5.bg-dark.text-light
+                            | CPU
+                        .ui-progress.clearfix.d-none(id="template")
+                            a(id="templateHeader") Использует оперативной памяти 1
+                            .progress
+                                .progress-bar(id="templateBody", role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+                        .card-body(id="CPU")
+                            div
+                                .ui-progress.clearfix
+                                    a Выделено оперативной памяти
+                                    .progress
+                                        .progress-bar(role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+                                .ui-progress.clearfix
+                                    a Кол-во пользователей
+                                    .progress
+                                        .progress-bar(role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+                                .ui-progress.clearfix
+                                    a Кол-во соединений
+                                    .progress
+                                        .progress-bar(role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+                .col-md-6.col-sm-6.col-xs-6
+                    .card.mb-4.box-shadow
+                        .card-header.h5.bg-dark.text-light
+                            | Memory
+                        .card-body
+                            .ct-chart(id="chart")
+            h3
+                a Информация о узлах
+            .col-md-3.col-sm-6.col-xs-6.col-mob.d-none(id="workerTemplate")
+                .card.mb-4.box-shadow
+                    .card-body
+                        h4
+                            a Узел1
+                        .ui-progress.clearfix
+                            a Использует оперативной памяти
+                            .progress
+                                .progress-bar(role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+                        .ui-progress.clearfix
+                            a Выделено оперативной памяти
+                            .progress
+                                .progress-bar(role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+                        .ui-progress.clearfix
+                            a Кол-во пользователей
+                            .progress
+                                .progress-bar(role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+                        .ui-progress.clearfix
+                            a Кол-во соединений
+                            .progress
+                                .progress-bar(role='progressbar', style='width: 25%;', aria-valuenow='25', aria-valuemin='0', aria-valuemax='100') 25%
+            div(id="infoCluster")
+                a Информация об узлах не доступна
+    script(type="text/javascript", src="https://rawgit.com/gionkunz/chartist-js/master/dist/chartist.js")
+    script.
+        var socket = io.connect(
+            {
+                'forceNew': true,
+                'reconnection': true,
+                'reconnectionDelay': 1000,
+                'reconnectionDelayMax': 5000,
+                'reconnectionAttempts': 5
+            });
+        var masMemory = [];
+        socket.emit('serverInfo');
+        socket.on('answerServerInfo', function (memory, cpuCount,workersInfo,infoCPU) {
+            var allUseMemory = 0;
+            var allAllocatedMemory = 0;
+            var allGamers = 0;
+            var allConnection = 0;
+            var CPU = document.getElementById("CPU");
+            var newCPU = document.createElement('div');
+            for(var i=0;i<cpuCount;i++) {
+                if (infoCPU[i] !== undefined) {
+                    var templateHeader = document.getElementById("templateHeader");
+                    var templateBody = document.getElementById("templateBody");
+                    var template = document.getElementById("template");
+                    templateHeader.innerHTML = infoCPU[i].numberCPU;
+                    templateBody.innerHTML = infoCPU[i].userCPU + infoCPU[i].sysCPU + "%";
+                    var newTemplate = template.cloneNode(true);
+                    newTemplate.classList.toggle("d-none");
+                    newCPU.appendChild(newTemplate);
+                }
+            }
+            CPU.replaceChild(newCPU,CPU.lastElementChild);
+
+            /**Заполнение информации о кластере**/
+            var listHeader = ["PID сервера", "Порт сервера", "Использует оперативной памяти", "Выделено оперативной памяти", "Кол-во пользователей", "Кол-во соединений"]
+            var infoClusterField = document.getElementById("infoCluster");
+            var table1 = document.createElement("table");
+            table1.className="table table-bordered";
+
+            for (i = 0; i < cpuCount; i++) {
+                var row1 = table1.insertRow(-1);
+                for (var j = 0; j < 6; j++) {
+                    var cell1 = row1.insertCell(-1);
+                    if (workersInfo[i] !== undefined) {
+                        switch (j) {
+                            case 0:
+                                cell1.innerHTML = workersInfo[i].pid;
+                                break;
+                            case 1:
+                                cell1.innerHTML = workersInfo[i].port;
+                                break;
+                            case 2:
+                                allUseMemory += workersInfo[i].useMemory;
+                                cell1.innerHTML = workersInfo[i].useMemory + " MB";
+                                break;
+                            case 3:
+                                allAllocatedMemory += workersInfo[i].allocatedMemory;
+                                cell1.innerHTML = workersInfo[i].allocatedMemory + " MB";
+                                break;
+                            case 4:
+                                allGamers += workersInfo[i].countUser;
+                                cell1.innerHTML = workersInfo[i].countUser;
+                                break;
+                            case 5:
+                                allConnection += workersInfo[i].countConnection;
+                                cell1.innerHTML = workersInfo[i].countConnection;
+                                break;
+                        }
+                    }
+                }
+            }
+            row1 = table1.insertRow(-1);
+            row1.insertCell(-1);
+            row1.insertCell(-1).innerHTML = "Всего";
+            row1.insertCell(-1).innerHTML = Math.round(allUseMemory * 100) / 100 + " MB";
+            row1.insertCell(-1).innerHTML = Math.round(allAllocatedMemory * 100) / 100 + " MB";
+            row1.insertCell(-1).innerHTML = allGamers + "";
+            row1.insertCell(-1).innerHTML = allConnection + "";
+            /**Заголовок таблицы**/
+            var header1 = table1.createTHead();
+            header1.className = "table-dark";
+            var row = header1.insertRow(-1);
+            for (var key in listHeader){
+                row.insertCell(-1).innerHTML = listHeader[key];
+            }
+            infoClusterField.replaceChild(table1, infoClusterField.lastChild);
+
+            /**График памяти**/
+            masMemory.push(allAllocatedMemory);
+            if (masMemory.length === 15) {
+                masMemory.splice(0, 1);
+            }
+            try {
+                new Chartist.Line('#chart', {
+                    series: [
+                        masMemory
+                    ]
+                }, {
+                    low: 0,
+                    showArea: true
+                });
+            } catch (err) {
+                var chart = document.getElementById("chart");
+                chart.innerHTML = "Библиотека не загружена";
+            }
+            //Функция запроса информации о сервере
+            setTimeout(function () {
+                socket.emit('serverInfo');
+            }, 1000);
+        });

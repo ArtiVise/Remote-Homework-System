@@ -2,6 +2,7 @@
 var cluster = require('cluster');//Включаем cluster
 var events = require('events');
 var os = require('os');
+const path = require('path');
 var cpuCount = require('os').cpus().length;//Количество ядер процессора(потоков)
 var worker = require('./app.js');
 
@@ -28,12 +29,18 @@ if (cluster.isMaster) {
                             workersInfo[i].useMemory = msg.useMemory;
                             workersInfo[i].allocatedMemory = msg.allocatedMemory;
                             workersInfo[i].countUser = msg.countUser;
+                            workersInfo[i].countConnection = msg.countConnection;
                             flag=1;
                             break;
                         }
                     }
                 }
-                if(flag===0) workersInfo.push({id: msg.id,pid: msg.pid,port: msg.port, useMemory: msg.useMemory,allocatedMemory: msg.allocatedMemory, countUser: msg.countUser});
+                if(flag===0) workersInfo.push({id: msg.id,
+                    pid: msg.pid,port: msg.port,
+                    useMemory: msg.useMemory,
+                    allocatedMemory: msg.allocatedMemory,
+                    countUser: msg.countUser,
+                    countConnection: msg.countConnection});
             }
 
         });
@@ -42,29 +49,38 @@ if (cluster.isMaster) {
 
     var expressBalancer = require('express');
     var appBalancer = expressBalancer();
-    var httpBalancer = require('http').Server(appBalancer);
-    var ioBalancer = require('socket.io')(httpBalancer);
+
     var NumHost = 0;
     appBalancer.get("/", function (request, response) {
         NumHost++;
         if(NumHost===cpuCount) NumHost=0;
-        response.redirect("http://" + request.headers.host.split(':')[0] + arrayPortWorkers[NumHost]);
+        response.redirect("https://" + request.headers.host.split(':')[0] + arrayPortWorkers[NumHost]);
     });
+    appBalancer.set('views', path.join(__dirname, 'views'));
+    appBalancer.set('view engine', 'pug');
+    appBalancer.use(expressBalancer.static(path.join(__dirname, 'public')));
+    appBalancer.use('/js', expressBalancer.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect bootstrap JS
+    appBalancer.use('/js', expressBalancer.static(__dirname + '/node_modules/jquery/dist')); // redirect JS jQuery
+    appBalancer.use('/css', expressBalancer.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
     appBalancer.get("/monitor", function (request, response) {
         response.sendFile(__dirname + '/views/monitorServer.html');
     });
-
+    appBalancer.get("/monitorNew", function (request, response) {
+        response.render('newMonitorServer',{StudentName: "Администратор"});
+    });
     appBalancer.set('port', (process.env.PORT || 5000));
+    var httpBalancer = require('http').Server(appBalancer);
     httpBalancer.listen(appBalancer.get('port'), function () {
         console.log('Запущен балансер на порту', appBalancer.get('port'));
     });
 
+    var ioBalancer = require('socket.io')(httpBalancer);
     ioBalancer.on('connection', function (socket) {
         /** Получение состояние сервера для мониторинга**/
         socket.on('serverInfo', function () {
 
             var used = process.memoryUsage().heapUsed / 1024 / 1024;
-            socket.emit('answerServerInfo', Math.round(used * 100) / 100,0,cpuCount,workersInfo,infoCPU);
+            socket.emit('answerServerInfo', Math.round(used * 100) / 100,cpuCount,workersInfo,infoCPU);
         });
     });
     /**-----------------------------------**/

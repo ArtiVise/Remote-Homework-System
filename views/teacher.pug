@@ -1,4 +1,4 @@
-extends ./base
+extends baseTeacher
 block main
     main.container(role='main')
         div.card
@@ -46,6 +46,14 @@ block main
                         button(type="submit" class="btn btn-primary") Оставить комментарий
     script(type="text/javascript", src="/javascripts/sendAnswer.js")
     script.
+        var socket = io.connect(
+            {
+                'forceNew': true,
+                'reconnection': true,
+                'reconnectionDelay': 1000,
+                'reconnectionDelayMax': 5000,
+                'reconnectionAttempts': 5
+            });
         var a = 0;
         function RowClick(row) {
             //console.log(row.id);

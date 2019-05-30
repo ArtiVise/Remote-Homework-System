@@ -5,26 +5,7 @@ var os = require('os');
 var cpuCount = require('os').cpus().length;//Количество ядер процессора(потоков)
 
 if (cluster.isWorker) {
-    var worker_id = cluster.worker.id;
-    var port = process.argv[2];
-    let countUser=0;
-    console.log("Worker id:", worker_id, "pid:", process.pid, "started on port:", port);
-
-    process.on('message', function (msg) {
-        // we only want to intercept messages that have a chat property
-        if (msg.type === 'GetServerInfo') {
-            process.send({
-                type: "answerServerInfo", id: worker_id,
-                pid: process.pid,
-                port: port,
-                useMemory: Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100,
-                allocatedMemory: Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100,
-                countUser: countUser
-            });
-        }
-    });
-
-//Загрузка библиотек
+    //Загрузка библиотек
     const path = require('path');
     const favicon = require('serve-favicon');
     const cookieParser = require('cookie-parser');
@@ -40,6 +21,34 @@ if (cluster.isWorker) {
     const bodyParser = require('body-parser');
     const mongoose = require('./config/database'); //database configuration
     const app = express();
+    const rateLimit = require("express-rate-limit");
+
+    const https = require('https');
+    const fs = require('fs');
+
+    let worker_id = cluster.worker.id;
+    let port = process.argv[2];
+    let countUser=0;
+    let countConnection=0;
+    console.log("Worker id:", worker_id, "pid:", process.pid, "started on port:", port);
+
+    process.on('message', function (msg) {
+        // we only want to intercept messages that have a chat property
+        server.getConnections(function(error, count) {
+            countConnection=count;
+        });
+        if (msg.type === 'GetServerInfo') {
+            process.send({
+                type: "answerServerInfo", id: worker_id,
+                pid: process.pid,
+                port: port,
+                useMemory: Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100,
+                allocatedMemory: Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100,
+                countUser: countUser,
+                countConnection:countConnection
+            });
+        }
+    });
 
 // Инициадизация модели базы данных
     const models = require('./models/models');
@@ -54,19 +63,46 @@ if (cluster.isWorker) {
 
     app.set('secretKey', 'nodeRestApi'); // jwt secret token
 
+    const limiter = rateLimit({
+        windowMs: 5 * 60 * 1000, // 5 minutes
+        max: 200, // limit each IP to 100 requests per windowMs
+        message:
+            "Вы превысили число запросов, отдохните и попробуйте позже"
+    });
+
+    const loginLimitRequest = rateLimit({
+        windowMs: 5 * 60 * 1000, // 5 minutes
+        max: 10, // start blocking after 100 requests
+        message:
+            "Login, От вас слишком много запросов, попробуйте через 5 минут"
+    });
+
+    const studentLimitRequest = rateLimit({
+        windowMs: 5 * 60 * 1000, // 5 minutes
+        max: 50, // start blocking after 100 requests
+        message:
+            "От вас слишком много запросов, попробуйте через 5 минут"
+    });
+
+    const teacherLimitRequest = rateLimit({
+        windowMs: 5 * 60 * 1000, // 5 minutes
+        max: 200, // start blocking after 100 requests
+        message:
+            "От вас слишком много запросов, попробуйте через 5 минут"
+    });
 //app.use(require('express-promise')());
 // Подключение к MongoDB
     mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
+    app.use(limiter);
     app.use(bodyParser.urlencoded({extended: false}));
 // parse application/json
     app.use(cookieParser());
-    app.use(session({ secret: 'keyboard cat', cookie: { maxAge: 60000 }, resave: true, saveUninitialized: true }))
+    app.use(session({ secret: 'secret key', cookie: { maxAge: 60000 }, resave: true, saveUninitialized: true }))
 //Маршрутизация
     app.use('/', index);
     app.use('/users', users);
-    app.use('/student', validateFunction.logout, validateFunction.newValidateUser, student);
-    app.use('/teacher', validateFunction.logout, validateFunction.newValidateTeacher, teacher);
+    app.use('/student', validateFunction.logout, validateFunction.statusStudent, validateFunction.validateAccessToken, validateFunction.validateRefreshToken, student);
+    app.use('/teacher', validateFunction.logout, validateFunction.statusTeacher, validateFunction.validateAccessToken, validateFunction.validateRefreshToken, teacher);
 
 // Настройка представлений и шаблонизатора
     app.set('views', path.join(__dirname, 'views'));
@@ -99,8 +135,22 @@ if (cluster.isWorker) {
         }
     });
 
-    app.listen(port, function () {
-        console.log('Сервер запущен на порту: ' + port);
+    let server = https.createServer({
+        key: fs.readFileSync('./sslcert/key.pem'),
+        cert: fs.readFileSync('./sslcert/cert.pem'),
+        passphrase: 'qwerty'
+    },app).listen(port, function () {
+            console.log('Сервер запущен на порту: ' + port);
+        });
+    var io = require('socket.io')(server);
+
+    io.on('connection', function (socket) {
+        console.log("connection");
+        countUser = io.engine.clientsCount;
+        socket.on('disconnect', function (state) {
+            console.log("disconnect");
+            countUser = io.engine.clientsCount;
+        });
     });
 
     module.exports = app;
