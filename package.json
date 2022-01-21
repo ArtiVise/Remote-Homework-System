@@ -26,7 +26,7 @@
     "jquery": "^3.4.1",
     "jshint": "^2.9.7",
     "jsonwebtoken": "^8.5.1",
-    "log4js": "^4.3.0",
+    "log4js": "^6.4.0",
     "mongoose": "^5.5.9",
     "morgan": "^1.9.1",
     "multiparty": "^4.1.3",
